@@ -73,20 +73,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ['another name', 'another description']);
       print('inserted2: $id2');
     });
+
   }
 
   Future<void> getRecords() async {
     // Get the DB
     var database = _openDB();
     List<Map> list = await database.then((db) => db.rawQuery('SELECT * FROM account_type'));
-
-    // List<Map> expectedList = [
-    //   {'id': 1, 'name': 'CHECKING', 'description': 'Checking account type'},
-    //   {'id': 2, 'name': 'SAVINGS', 'description': 'Savings account type'}
-    // ];
     print(list);
-    // print(expectedList);
-
 
   }
 
