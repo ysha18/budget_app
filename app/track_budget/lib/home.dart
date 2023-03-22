@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
-
+import 'service/accountTypeService.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -24,73 +24,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<Database> _openDB() async{
-    var databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'budget_db.db');
-
-    // Check if the database exists
-    var exists = await databaseExists(path);
-
-    if (!exists) {
-      // Should happen only the first time you launch your application
-      print("Creating new copy from asset");
-
-      // Make sure the parent directory exists
-      try {
-        await Directory(dirname(path)).create(recursive: true);
-      } catch (_) {}
-
-      // Copy from asset
-      ByteData data = await rootBundle.load(join("database", "budget_db.db"));
-      List<int> bytes =
-      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-
-      // Write and flush the bytes written
-      await File(path).writeAsBytes(bytes, flush: true);
-
-    } else {
-      print("Opening existing database");
-    }
-
-// open the database
-    var db = await openDatabase(path);
-    return db;
-
-  }
-
-  void insert(){
-    _openDB().then((db) =>  insertIntoDb(db));
-  }
-
-  void insertIntoDb(Database database) async{
-    // Insert some records in a transaction
-    await database.transaction((txn) async {
-      int id1 = await txn.rawInsert(
-          'INSERT INTO ACCOUNT_TYPE (name, description) VALUES ("some name", "some description")');
-      print('inserted1: $id1');
-      int id2 = await txn.rawInsert(
-          'INSERT INTO ACCOUNT_TYPE (name, description) VALUES (?, ?)',
-          ['another name', 'another description']);
-      print('inserted2: $id2');
-    });
-
-  }
-
-  Future<void> getRecords() async {
-    // Get the DB
-    var database = _openDB();
-    List<Map> list = await database.then((db) => db.rawQuery('SELECT * FROM account_type'));
-    print(list);
-
-  }
-
   @override
   Widget build(BuildContext context) {
     // trying to display records
-    getRecords();
+    AccountTypeService accountTypeService = AccountTypeService();
+    var list = accountTypeService.listAll();
 
     // trying to insert in DB
-    insert();
+    // insert();
 
     return Scaffold(
       appBar: AppBar(
@@ -107,6 +48,38 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            GestureDetector(
+              onTap: (){
+                print("tapped");
+              },
+              child: Container(
+                margin: EdgeInsets.all(15.0),
+                decoration: BoxDecoration(
+                    color: Colors.brown,
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const <Widget>[
+                    Icon(
+                      Icons.adb,
+                      size: 80.0,
+                    ),
+                    SizedBox(height: 15.0),
+                    Text(
+                      "Som text",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Color(0xFF8D8E98),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            FutureBuilder(
+                future: null,
+                builder: null;
+            )
           ],
         ),
       ),

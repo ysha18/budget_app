@@ -1,9 +1,16 @@
+import '../repository/accountTypeRepository.dart';
+
 class AccountTypeService {
+
+  AccountTypeRepository accountTypeRepository = AccountTypeRepository();
 
   void create(){
 
   }
   void update(){}
   void delete(){}
-  void listAll(){}
+  Future<List<Map>> listAll(){
+    print("service list all");
+    return accountTypeRepository.getRecords();
+  }
 }

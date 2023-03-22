@@ -5,15 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 
 class CommonRepository {
-
   late Database database;
 
-  Database getDb(){
-    openDB().then((db) =>  database = db);
+  Database getDb() {
+    openDB().then((db) => database = db);
     return database;
   }
 
-  Future<Database> openDB() async{
+  Future<Database> openDB() async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'budget_db.db');
 
@@ -32,11 +31,10 @@ class CommonRepository {
       // Copy from asset
       ByteData data = await rootBundle.load(join("database", "budget_db.db"));
       List<int> bytes =
-      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
       // Write and flush the bytes written
       await File(path).writeAsBytes(bytes, flush: true);
-
     } else {
       print("Opening existing database");
     }
@@ -44,7 +42,14 @@ class CommonRepository {
 // open the database
     var db = await openDatabase(path);
     return db;
-
   }
 
+  Future<List<Map>> getRecords() async {
+    // Get the DB
+    var database = openDB();
+    List<Map> list =
+        await database.then((db) => db.rawQuery('SELECT * FROM account_type'));
+    print(list);
+    return list;
+  }
 }
